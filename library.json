@@ -1,0 +1,19 @@
+{
+    "name": "WiFiNetworkHub",
+    "keywords": "network, WiFi",
+    "description": "A network hub that connects to a WiFi network and provides TCP and UDP ports",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/markwomack/WiFiNetwork"
+    },
+    "authors":
+    {
+      "name": "Mark Womack",
+      "url": "https://github.com/markwomack",
+      "maintainer": true
+    },
+    "homepage": "https://github.com/markwomack/WiFiNetwork",
+    "version": "1.0.0",
+    "frameworks": "arduino"
+}
