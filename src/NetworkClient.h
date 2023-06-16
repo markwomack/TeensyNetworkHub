@@ -6,8 +6,6 @@
 #ifndef NETWORKCLIENT_H
 #define NETWORKCLIENT_H
 
-#include <DebugMsgs.h>
-
 #include <Client.h>
 #include "NetworkClientWrapper.h"
 
