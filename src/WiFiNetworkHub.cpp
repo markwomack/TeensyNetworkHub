@@ -190,7 +190,7 @@ void WiFiNetworkHub::stop(void) {
 
 // Returns a UDP port for use.
 //
-NetworkUDP* WiFiNetworkHub::getUdpPort(uint32_t portNum) {
+NetworkUDP* WiFiNetworkHub::getUDP(uint32_t portNum) {
   WiFiUDP* udp = new WiFiUDP();
   
   WiFiUDPWrapper* udpWrapper = new WiFiUDPWrapper(udp);
@@ -201,7 +201,7 @@ NetworkUDP* WiFiNetworkHub::getUdpPort(uint32_t portNum) {
 
 // Returns a TCP server for use.
 //
-NetworkServer* WiFiNetworkHub::getTCPServer(uint32_t portNum) {
+NetworkServer* WiFiNetworkHub::getServer(uint32_t portNum) {
   WiFiServer* tcpServer = new WiFiServer(portNum);
   
   WiFiServerWrapper* serverWrapper = new WiFiServerWrapper(tcpServer);
