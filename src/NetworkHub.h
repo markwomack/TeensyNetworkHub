@@ -28,7 +28,7 @@ class NetworkHub {
 
     // Open a UDP port on the given port number.
     // Returns a NetworkUDP for use.
-    virtual NetworkUDP* getUdpPort(uint32_t portNum) = 0;
+    virtual NetworkUDP* getUDP(uint32_t portNum) = 0;
     
     // Print the status of the hub to the given
     // Print object (ie Serial).
