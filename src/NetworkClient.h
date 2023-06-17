@@ -17,8 +17,6 @@ class NetworkClient : public Client {
   public:
     int connect(IPAddress ip, uint16_t port) { return _clientWrapper->connect(ip, port); };
     int connect(const char *host, uint16_t port) { return _clientWrapper->connect(host, port); };
-    int connectSSL(IPAddress ip, uint16_t port) { return _clientWrapper->connectSSL(ip, port); };
-    int connectSSL(const char *host, uint16_t port) { return _clientWrapper->connect(host, port); };
     size_t write(uint8_t b) { return _clientWrapper->write(b); };
     size_t write(const uint8_t *buf, size_t size) { return _clientWrapper->write(buf, size); };
     int available() { return _clientWrapper->available(); };

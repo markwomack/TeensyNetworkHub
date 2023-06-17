@@ -27,23 +27,24 @@ class WiFiNetworkHub : public NetworkHub {
     
     // Start the network hub, connecting to the WiFi network (ssid)
     // using the given password.
-    bool start(const char* ssid, const char* password, Print* printer);
+    bool begin(const char* ssid, const char* password, Print* printer);
+    
+    // Stop the network hub
+    void stop(void);
     
     // Implementations of NetworkHub interface
     void setHostIPAddress(IPAddress hostIPAddress);
-    void stop(void);
     NetworkUDP* getUdpPort(uint32_t portNum);
     NetworkServer* getTCPServer(uint32_t portNum);
     void printStatus(Print* printer);
     
-    static WiFiNetworkHub getWiFiNetworkHub() {
-      return _wiFiNetworkHub;
-    };
+    // Returns the singleton instance of WiFiNetworkHub
+    static WiFiNetworkHub getInstance();
     
   protected:
     WiFiNetworkHub() { /* Nothing to see here, move along. */ };
     
-    static WiFiNetworkHub _wiFiNetworkHub;
+    static WiFiNetworkHub* _wifiNetworkHub;
 };
 
 #endif // WIFINETWORKHUB_H

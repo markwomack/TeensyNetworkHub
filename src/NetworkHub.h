@@ -17,11 +17,10 @@
 // should not be created independently.
 class NetworkHub {
   public:
-    // Set a fixed IP address for the host (optional).
+    // Set a fixed IP address for the host. This is an
+    // optional call, otherwise an IP address will be
+    // assigned from the DHCP server.
     virtual void setHostIPAddress(IPAddress hostIPAddress) = 0;
-    
-    // Stop the network hub
-    virtual void stop(void) = 0;
 
     // Open a UDP port on the given port number.
     // Returns a NetworkUDP for use.

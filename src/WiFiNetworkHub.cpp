@@ -3,10 +3,8 @@
 // See accompanying LICENSE file for details.
 //
 
-// Arduino includes
-#include <SPI.h>
-
 // Third-party includes
+#include <SPI.h>
 #include <WiFiNINA.h> // https://github.com/adafruit/WiFiNINA
 #include <WiFiServer.h>
 #include <WiFiClient.h>
@@ -52,43 +50,6 @@ class WiFiClientWrapper : public NetworkClientWrapper {
     WiFiClient _wifiClient;
 };
 
-// NetworkUDPWrapper implementation for WiFiNINA WiFiUDP.
-//
-class WiFiUDPWrapper : public NetworkUDPWrapper {
-  public:
-    
-    uint8_t begin(uint16_t port) { return _wifiUDP->begin(port); };
-    uint8_t beginMulticast(IPAddress ip, uint16_t port) { return _wifiUDP->beginMulticast(ip, port); };
-    void stop() { _wifiUDP->stop(); }
-    int beginPacket(IPAddress ip, uint16_t port) { return _wifiUDP->beginPacket(ip, port); };
-    int beginPacket(const char *host, uint16_t port) { return _wifiUDP->beginPacket(host, port); };
-    int endPacket() { return _wifiUDP->endPacket(); };
-    size_t write(uint8_t b) { return _wifiUDP->write(b); };
-    size_t write(const uint8_t *buffer, size_t size) { return _wifiUDP->write(buffer, size); };
-    int parsePacket() { return _wifiUDP->parsePacket(); };
-    int available() { return _wifiUDP->available(); };
-    int read() { return _wifiUDP->read(); };
-    int read(unsigned char* buffer, size_t len) { return _wifiUDP->read(buffer, len); };
-    int read(char* buffer, size_t len) { return _wifiUDP->read(buffer, len); };
-    int peek() { return _wifiUDP->peek(); };
-    void flush() { _wifiUDP->flush(); };
-    IPAddress remoteIP() { return _wifiUDP->remoteIP(); };
-    uint16_t remotePort() { return _wifiUDP->remotePort(); };
-    
-    ~WiFiUDPWrapper() {
-      delete _wifiUDP;
-    };
-    
-  private:
-    friend class WiFiNetworkHub;
-    
-    WiFiUDPWrapper(WiFiUDP* wifiUDP) {
-      _wifiUDP = wifiUDP;
-    };
-    
-    WiFiUDP* _wifiUDP;
-};
-
 // NetworkServerWrapper implementation for WiFiNINA WiFiServer.
 //
 class WiFiServerWrapper : public NetworkServerWrapper {
@@ -119,6 +80,43 @@ class WiFiServerWrapper : public NetworkServerWrapper {
     WiFiServer* _wifiServer;
 };
 
+// NetworkUDPWrapper implementation for WiFiNINA WiFiUDP.
+//
+class WiFiUDPWrapper : public NetworkUDPWrapper {
+  public:
+    
+    uint8_t begin(uint16_t port) { return _wifiUDP->begin(port); };
+    uint8_t beginMulticast(IPAddress ip, uint16_t port) { return _wifiUDP->beginMulticast(ip, port); };
+    void stop() { _wifiUDP->stop(); };
+    int beginPacket(IPAddress ip, uint16_t port) { return _wifiUDP->beginPacket(ip, port); };
+    int beginPacket(const char *host, uint16_t port) { return _wifiUDP->beginPacket(host, port); };
+    int endPacket() { return _wifiUDP->endPacket(); };
+    size_t write(uint8_t b) { return _wifiUDP->write(b); };
+    size_t write(const uint8_t *buffer, size_t size) { return _wifiUDP->write(buffer, size); };
+    int parsePacket() { return _wifiUDP->parsePacket(); };
+    int available() { return _wifiUDP->available(); };
+    int read() { return _wifiUDP->read(); };
+    int read(unsigned char* buffer, size_t len) { return _wifiUDP->read(buffer, len); };
+    int read(char* buffer, size_t len) { return _wifiUDP->read(buffer, len); };
+    int peek() { return _wifiUDP->peek(); };
+    void flush() { _wifiUDP->flush(); };
+    IPAddress remoteIP() { return _wifiUDP->remoteIP(); };
+    uint16_t remotePort() { return _wifiUDP->remotePort(); };
+    
+    ~WiFiUDPWrapper() {
+      delete _wifiUDP;
+    };
+    
+  private:
+    friend class WiFiNetworkHub;
+    
+    WiFiUDPWrapper(WiFiUDP* wifiUDP) {
+      _wifiUDP = wifiUDP;
+    };
+    
+    WiFiUDP* _wifiUDP;
+};
+
 // Set up all of the SPI, busy, and reset
 // pins used by the Adafruit Airlift/ESP32.
 //
@@ -140,7 +138,7 @@ void WiFiNetworkHub::setPins(uint8_t spiMOSIPin, uint8_t spiMISOPin, uint8_t spi
 
 // Starts the network hub specifically using WiFiNINA interface.
 //
-bool WiFiNetworkHub::start(const char* ssid, const char* password, Print* printer) {
+bool WiFiNetworkHub::begin(const char* ssid, const char* password, Print* printer) {
 
   printer->print("Found firmware ");
   printer->println(WiFi.firmwareVersion());
@@ -230,3 +228,15 @@ void WiFiNetworkHub::printStatus(Print* printer) {
   printer->print(rssi);
   printer->println(" dBm");
 }
+
+// Static members and methods
+
+WiFiNetworkHub* WiFiNetworkHub::_wifiNetworkHub = NULL;
+    
+// Returns the instance of WiFiNetworkHub
+WiFiNetworkHub WiFiNetworkHub::getInstance() {
+  if (_wifiNetworkHub == NULL) {
+    _wifiNetworkHub = new WiFiNetworkHub();
+  }
+  return *_wifiNetworkHub;
+};
