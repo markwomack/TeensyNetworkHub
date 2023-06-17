@@ -21,8 +21,8 @@ class EthernetNetworkHub : public NetworkHub {
     
     // NetworkHub methods
     void setHostIPAddress(IPAddress hostIPAddress);
-    NetworkUDP* getUdpPort(uint32_t portNum);
-    NetworkServer* getTCPServer(uint32_t portNum);
+    NetworkServer* getServer(uint32_t portNum);
+    NetworkUDP* getUDP(uint32_t portNum);
     void printStatus(Print* printer);
     
     // Returns the singleton instance of EthernetNetworkHub
