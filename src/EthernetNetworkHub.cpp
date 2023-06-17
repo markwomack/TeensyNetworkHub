@@ -139,7 +139,7 @@ void EthernetNetworkHub::setHostIPAddress(IPAddress hostIPAddress) {
   _localIPAddressSet = true;
 }
     
-NetworkUDP* EthernetNetworkHub::getUdpPort(uint32_t portNum) {
+NetworkUDP* EthernetNetworkHub::getUDP(uint32_t portNum) {
   EthernetUDP udp;
   
   EthernetUDPXWrapper* udpWrapper = new EthernetUDPXWrapper(udp);
@@ -148,7 +148,7 @@ NetworkUDP* EthernetNetworkHub::getUdpPort(uint32_t portNum) {
   return NetworkFactory::createNetworkUDP(udpWrapper);
 }
 
-NetworkServer* EthernetNetworkHub::getTCPServer(uint32_t portNum) {
+NetworkServer* EthernetNetworkHub::getServer(uint32_t portNum) {
   EthernetServer tcpServer(portNum);
   
   EthernetServerXWrapper* serverWrapper = new EthernetServerXWrapper(tcpServer);
