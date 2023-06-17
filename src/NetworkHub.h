@@ -21,14 +21,14 @@ class NetworkHub {
     // optional call, otherwise an IP address will be
     // assigned from the DHCP server.
     virtual void setHostIPAddress(IPAddress hostIPAddress) = 0;
+    
+    // Open a TCP port on the given port number.
+    // Returns a NetworkServer for use.
+    virtual NetworkServer* getServer(uint32_t portNum) = 0;
 
     // Open a UDP port on the given port number.
     // Returns a NetworkUDP for use.
     virtual NetworkUDP* getUdpPort(uint32_t portNum) = 0;
-    
-    // Open a TCP port on the given port number.
-    // Returns a NetworkServer for use.
-    virtual NetworkServer* getTCPServer(uint32_t portNum) = 0;
     
     // Print the status of the hub to the given
     // Print object (ie Serial).
