@@ -8,6 +8,7 @@
 
 #include <Arduino.h>
 
+#include "NetworkClient.h"
 #include "NetworkServer.h"
 #include "NetworkUDP.h"
 
