@@ -24,22 +24,27 @@ the common interface provided for all subclass specific versions
 [Native Ethernet](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/EthernetNetworkHub.h)). It provides
 methods for creating the primary objects to interact with the underlying network.
 
-### NetworkClient
+### [NetworkClient](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/NetworkClient.h)
 Defines the interface for client interface to the network. The **getClient** method of NetworkHub should be
 called to create a new instance. Instances are also returned by NetworkServer.available().
 
-### NetworkServer
+### [NetworkServer](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/NetworkServer.h)
 Defines the interface for a server interface to the network. The **getServer** method of NetworkHub should be
 called to create a new instance.
 
-### NetworkUDP
+### [NetworkUDP](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/NetworkUDP.h)
 Defines the interface for a UDP interface to the network. The **getUDP** method of NetworkHub should be called
 to create a new instance.
 
 ## Examples
-Please see the [basic examples](https://github.com/markwomack/TeensyNetworkHub/tree/main/examples) for usage
-documentation.
+The included [examples](https://github.com/markwomack/TeensyNetworkHub/tree/main/examples) come from the original
+NativeEthernet examples. They demonstrate basic usage for NetworkClient, NetworkServer, and NetworkUDP.
 
 ## Extending
+If you have a favorite network library for connecting to the internet, it is easy to extend TeensyNetworkHub to
+support it. You will need to implement wrappers to integrate the library with TeensyNetworkHub, and implement
+a version of NetworkHub to iniitalize the connection and provide the clients, servers, and UDPs. Please see either
+[WiFiNetworkHub](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/WiFiNetworkHub.h) or 
+[EthernetNetworkHub](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/EthernetNetworkHub.h) for examples.
 
 If you have any suggestions or bugs, please [open an issue](https://github.com/markwomack/TeensyNetworkHub/issues).
