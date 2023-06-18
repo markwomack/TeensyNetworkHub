@@ -15,20 +15,45 @@
 // must implement the methods. The objects used to interact
 // with the network are created by calls to the hub, and
 // should not be created independently.
+//
 class NetworkHub {
   public:
-    // Set a fixed IP address for the host. This is an
+    // Set a fixed IP address for this device. This is an
     // optional call, otherwise an IP address will be
     // assigned from the DHCP server.
-    virtual void setHostIPAddress(IPAddress hostIPAddress) = 0;
+    void setLocalIPAddress(IPAddress localIPAddress) {
+      _localIPAddress = localIPAddress;
+      _hasLocalIPAddress = true;
+    };
     
-    // Open a TCP port on the given port number.
-    // Returns a NetworkServer for use.
+    void setDNSIPAddress(IPAddress dnsIPAddress) {
+      _dnsIPAddress = dnsIPAddress;
+      _hasDNSIPAddress = true;
+    };
+    
+    void setGatewayIPAddress(IPAddress gatewayIPAddress) {
+      _gatewayIPAddress = gatewayIPAddress;
+      _hasGatewayIPAddress = true;
+    };
+    
+    void setSubnetMask(IPAddress subnetMask) {
+      _subnetMask = subnetMask;
+      _hasSubnetMask = true;
+    };
+    
+    virtual IPAddress getLocalIPAddress() = 0;
+    
+    // Create a client to access the network.
+    // Returns a NetworkClient for use.
+    virtual NetworkClient getClient() = 0;
+    
+    // Create a TCP server for the given port number.
+    // Returns a pointer to a NetworkServer for use.
     virtual NetworkServer* getServer(uint32_t portNum) = 0;
 
-    // Open a UDP port on the given port number.
-    // Returns a NetworkUDP for use.
-    virtual NetworkUDP* getUDP(uint32_t portNum) = 0;
+    // Create a UDP port.
+    // Returns a pointer to a NetworkUDP for use.
+    virtual NetworkUDP* getUDP() = 0;
     
     // Print the status of the hub to the given
     // Print object (ie Serial).
@@ -36,6 +61,64 @@ class NetworkHub {
     
   protected:
     NetworkHub() { /* Nothing to see here, move along. */ }
+    
+    bool _hasLocalIPAddress = false;
+    IPAddress _localIPAddress;
+    bool _hasDNSIPAddress = false;
+    IPAddress _dnsIPAddress;
+    bool _hasGatewayIPAddress = false;
+    IPAddress _gatewayIPAddress;
+    bool _hasSubnetMask = false;
+    IPAddress _subnetMask;
+    
+    bool hasConfiguredLocalIPAddress() {
+      return _hasLocalIPAddress;
+    };
+    
+    IPAddress getConfiguredLocalIPAddress() {
+      return _localIPAddress;
+    };
+    
+    bool hasConfiguredDNSIPAddress() {
+      return _hasDNSIPAddress;
+    };
+    
+    IPAddress getConfiguredDNSIPAddress() {
+      // If no DNS ip address has been set, but a local ip address has,
+      // then assume the DNS is the local ip with '1' for the last element.
+      if (!_hasDNSIPAddress && _hasLocalIPAddress) {
+        _dnsIPAddress = _localIPAddress;
+        _dnsIPAddress[3] = 1;
+      }
+      return _dnsIPAddress;
+    };
+    
+    bool hasConfiguredGatewayIPAddress() {
+      return _hasGatewayIPAddress;
+    };
+    
+    IPAddress getConfiguredGatewayIPAddress() {
+      // If no gateway ip address has been set, but a local ip address has,
+      // then assume the gateway is the local ip with '1' for the last element.
+      if (!_hasGatewayIPAddress && _hasLocalIPAddress) {
+        _gatewayIPAddress = _localIPAddress;
+        _gatewayIPAddress[3] = 1;
+      }
+      return _gatewayIPAddress;
+    };
+    
+    bool hasConfiguredSubnetMask() {
+      return _hasSubnetMask;
+    };
+    
+    IPAddress getConfiguredSubnetMask() {
+      // If no subnet has been set, then assume the
+      // subnet mask should be 255.255.255.0
+      if (!_hasSubnetMask) {
+        _subnetMask = IPAddress(255, 255, 255, 0);
+      }
+      return _gatewayIPAddress;
+    };
 };
 
 #endif // NETWORKHUB_H

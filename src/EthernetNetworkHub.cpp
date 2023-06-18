@@ -18,7 +18,7 @@
 
 // NetworkClientWrapper implementation for NativeEthernet EthernetClient.
 //
-class EthernetClientXWrapper : public NetworkClientWrapper {
+class EthernetClientWrapper : public NetworkClientWrapper {
   public:
     int connect(IPAddress ip, uint16_t port) { return _ethernetClient.connect(ip, port); };
     int connect(const char *host, uint16_t port) { return _ethernetClient.connect(host, port); };
@@ -32,11 +32,15 @@ class EthernetClientXWrapper : public NetworkClientWrapper {
     void stop() { _ethernetClient.stop(); };
     uint8_t connected() { return _ethernetClient.connected(); };
     operator bool() { return _ethernetClient ? true : false; };
+    IPAddress remoteIP() { return _ethernetClient.remoteIP(); };
+    uint16_t remotePort() { return _ethernetClient.remotePort(); };
     
   private:
-    friend class EthernetServerXWrapper;
+    friend class EthernetNetworkHub;
+    friend class EthernetServerWrapper;
     
-    EthernetClientXWrapper(EthernetClient& ethernetClient) {
+    EthernetClientWrapper() {};
+    EthernetClientWrapper(EthernetClient& ethernetClient) {
       _ethernetClient = ethernetClient;
     };
     
@@ -45,12 +49,12 @@ class EthernetClientXWrapper : public NetworkClientWrapper {
 
 // NetworkServerWrapper implementation for NativeEthernet EthernetServer.
 //
-class EthernetServerXWrapper : public NetworkServerWrapper {
+class EthernetServerWrapper : public NetworkServerWrapper {
   public:
     NetworkClient available() {
       EthernetClient ethernetClient = _ethernetServer.available();
       
-      EthernetClientXWrapper* clientWrapper = new EthernetClientXWrapper(ethernetClient);
+      EthernetClientWrapper* clientWrapper = new EthernetClientWrapper(ethernetClient);
       
       return NetworkFactory::createNetworkClient(clientWrapper);
     };
@@ -62,7 +66,7 @@ class EthernetServerXWrapper : public NetworkServerWrapper {
   private:
     friend class EthernetNetworkHub;
     
-    EthernetServerXWrapper(EthernetServer& ethernetServer) {
+    EthernetServerWrapper(EthernetServer& ethernetServer) {
       _ethernetServer = ethernetServer;
     };
     
@@ -71,7 +75,7 @@ class EthernetServerXWrapper : public NetworkServerWrapper {
 
 // NetworkUDPWrapper implementation for NativeEthernet EthernetUDP.
 //
-class EthernetUDPXWrapper : public NetworkUDPWrapper {
+class EthernetUDPWrapper : public NetworkUDPWrapper {
   public:
     
     uint8_t begin(uint16_t port) { return _ethernetUDP.begin(port); };
@@ -95,7 +99,7 @@ class EthernetUDPXWrapper : public NetworkUDPWrapper {
   private:
     friend class EthernetNetworkHub;
     
-    EthernetUDPXWrapper(EthernetUDP& ethernetUDP) {
+    EthernetUDPWrapper(EthernetUDP& ethernetUDP) {
       _ethernetUDP = ethernetUDP;
     };
     
@@ -104,68 +108,65 @@ class EthernetUDPXWrapper : public NetworkUDPWrapper {
 
 bool EthernetNetworkHub::begin(uint8_t *macAddress, Print* printer) {
 
-  bool noError = true;
+  bool hadError = false;
   
   // start the Ethernet connection
-  if (_localIPAddressSet) {
+  if (hasConfiguredLocalIPAddress()) {
     printer->print("Connecting with ip address ");
-    printer->println(_localIPAddress);
-    Ethernet.begin(macAddress, _localIPAddress);
+    printer->println(getConfiguredLocalIPAddress());
+    Ethernet.begin(macAddress, getConfiguredLocalIPAddress(), getConfiguredDNSIPAddress(),
+      getConfiguredGatewayIPAddress(), getConfiguredSubnetMask());
   } else {
     printer->println("Connecting with ip address from DHCP");
     int status = Ethernet.begin(macAddress);
     if (status == 0) {
       printer->println("Failed to configure Ethernet using DHCP");
-      noError = false;
+      hadError = true;
     }
   }
 
   // Check for Ethernet hardware present
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
     printer->println("Ethernet hardware was not found.");
-    noError = false;
+    hadError = true;
   }
   
   if (Ethernet.linkStatus() == LinkOFF) {
     printer->println("Ethernet cable is not connected.");
-    noError = false;
+    hadError = true;
   }
   
-  return noError;
+  return !hadError;
 }
 
-void EthernetNetworkHub::setHostIPAddress(IPAddress hostIPAddress) {
-  _localIPAddress = hostIPAddress;
-  _localIPAddressSet = true;
+IPAddress EthernetNetworkHub::getLocalIPAddress() {
+  return Ethernet.localIP();
 }
-    
-NetworkUDP* EthernetNetworkHub::getUDP(uint32_t portNum) {
-  EthernetUDP udp;
+
+NetworkClient EthernetNetworkHub::getClient() {
+  EthernetClientWrapper* clientWrapper = new EthernetClientWrapper();
   
-  EthernetUDPXWrapper* udpWrapper = new EthernetUDPXWrapper(udp);
-  udpWrapper->begin(portNum);
-  
-  return NetworkFactory::createNetworkUDP(udpWrapper);
+  return NetworkFactory::createNetworkClient(clientWrapper);
 }
 
 NetworkServer* EthernetNetworkHub::getServer(uint32_t portNum) {
   EthernetServer tcpServer(portNum);
   
-  EthernetServerXWrapper* serverWrapper = new EthernetServerXWrapper(tcpServer);
-  serverWrapper->begin();
+  EthernetServerWrapper* serverWrapper = new EthernetServerWrapper(tcpServer);
   
   return NetworkFactory::createNetworkServer(serverWrapper);
 }
+    
+NetworkUDP* EthernetNetworkHub::getUDP() {
+  EthernetUDP udp;
+  
+  EthernetUDPWrapper* udpWrapper = new EthernetUDPWrapper(udp);
+  
+  return NetworkFactory::createNetworkUDP(udpWrapper);
+}
+
 
 void EthernetNetworkHub::printStatus(Print* printer) {
-  uint8_t mac_address[6];
-  Ethernet.MACAddress(mac_address);
-  IPAddress localIP = Ethernet.localIP();
-  IPAddress subnetMask = Ethernet.subnetMask();
-  IPAddress gatewayIP = Ethernet.gatewayIP();
-  IPAddress dhcpServerIP = Ethernet.dhcpServerIP();
-  IPAddress dnsServerIP = Ethernet.dnsServerIP();
-  
   printer->print("Hardware Status: ");
   switch(Ethernet.hardwareStatus()) {
     case EthernetNoHardware:
@@ -200,29 +201,31 @@ void EthernetNetworkHub::printStatus(Print* printer) {
       break;
   }
   
+  uint8_t macAddress[6];
+  Ethernet.MACAddress(macAddress);
   printer->print("MAC Address: ");
-  for (size_t x = 0; x < sizeof(mac_address); x++) {
-    printer->print(mac_address[x], HEX);
-    if (x < sizeof(mac_address) - 1) {
+  for (size_t x = 0; x < sizeof(macAddress); x++) {
+    printer->print(macAddress[x], HEX);
+    if (x < sizeof(macAddress) - 1) {
       printer->print(":");
     }
   }
   printer->println();
   
   printer->print("IP Address: ");
-  printer->println(localIP);
+  printer->println(Ethernet.localIP());
   
   printer->print("Subnet Mask: ");
-  printer->println(subnetMask);
+  printer->println(Ethernet.subnetMask());
   
   printer->print("Gateway IP: ");
-  printer->println(gatewayIP);
+  printer->println(Ethernet.gatewayIP());
   
   printer->print("DHCP Server IP: ");
-  printer->println(dhcpServerIP);
+  printer->println(Ethernet.dhcpServerIP());
   
   printer->print("DNS Server IP: ");
-  printer->println(dnsServerIP);
+  printer->println(Ethernet.dnsServerIP());
 }
 
 // Static members and methods

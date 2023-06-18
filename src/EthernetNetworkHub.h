@@ -20,9 +20,10 @@ class EthernetNetworkHub : public NetworkHub {
     bool begin(uint8_t *macAddress, Print* printer);
     
     // NetworkHub methods
-    void setHostIPAddress(IPAddress hostIPAddress);
+    IPAddress getLocalIPAddress();
+    NetworkClient getClient();
     NetworkServer* getServer(uint32_t portNum);
-    NetworkUDP* getUDP(uint32_t portNum);
+    NetworkUDP* getUDP();
     void printStatus(Print* printer);
     
     // Returns the singleton instance of EthernetNetworkHub
@@ -32,9 +33,6 @@ class EthernetNetworkHub : public NetworkHub {
     EthernetNetworkHub() { /* Nothing to see here, move along. */ };
     
     static EthernetNetworkHub* _ethernetNetworkHub;
-    
-    IPAddress _localIPAddress;
-    bool _localIPAddressSet = false;
 };
 
 #endif // ETHERNETNETWORKHUB_H

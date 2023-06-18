@@ -39,8 +39,11 @@ class WiFiClientWrapper : public NetworkClientWrapper {
     void stop() { _wifiClient.stop(); };
     uint8_t connected() { return _wifiClient.connected(); };
     operator bool() { return _wifiClient ? true : false; };
+    IPAddress remoteIP() { return _wifiClient.remoteIP(); };
+    uint16_t remotePort() { return _wifiClient.remotePort(); };
     
   private:
+    friend class WiFiNetworkHub;
     friend class WiFiServerWrapper;
     
     WiFiClientWrapper(WiFiClient& wifiClient) {
@@ -149,6 +152,11 @@ bool WiFiNetworkHub::begin(const char* ssid, const char* password, Print* printe
     return false;
   }
 
+  if (hasConfiguredLocalIPAddress()) {
+    WiFi.config(getConfiguredLocalIPAddress(), getConfiguredDNSIPAddress(),
+      getConfiguredGatewayIPAddress(), getConfiguredSubnetMask());
+  }
+  
   int status = WL_IDLE_STATUS;
   int attemptsLeft = 3;
   
@@ -174,59 +182,69 @@ bool WiFiNetworkHub::begin(const char* ssid, const char* password, Print* printe
   return true;
 }
 
-// Sets the host ip address for this device. This call is
-// optional. If not set, an address will be set via DHCP.
-//
-void WiFiNetworkHub::setHostIPAddress(IPAddress hostIPAddress) {
-  // Set a static ip address
-  WiFi.config(hostIPAddress);
-}
-
-// Stops the WiFiNetworkHub.
-//
 void WiFiNetworkHub::stop(void) {
   WiFi.end();
 }
 
-// Returns a UDP port for use.
-//
-NetworkUDP* WiFiNetworkHub::getUDP(uint32_t portNum) {
-  WiFiUDP* udp = new WiFiUDP();
-  
-  WiFiUDPWrapper* udpWrapper = new WiFiUDPWrapper(udp);
-  udpWrapper->begin(portNum);
-  
-  return NetworkFactory::createNetworkUDP(udpWrapper);
+IPAddress WiFiNetworkHub::getLocalIPAddress() {
+  return WiFi.localIP();
 }
 
-// Returns a TCP server for use.
-//
+NetworkClient WiFiNetworkHub::getClient() {
+  WiFiClient client;
+  
+  WiFiClientWrapper* clientWrapper = new WiFiClientWrapper(client);
+  
+  return NetworkFactory::createNetworkClient(clientWrapper);
+}
+
 NetworkServer* WiFiNetworkHub::getServer(uint32_t portNum) {
   WiFiServer* tcpServer = new WiFiServer(portNum);
   
   WiFiServerWrapper* serverWrapper = new WiFiServerWrapper(tcpServer);
-  serverWrapper->begin();
   
   return NetworkFactory::createNetworkServer(serverWrapper);
 }
 
-// Prints current status.
-//
+NetworkUDP* WiFiNetworkHub::getUDP() {
+  WiFiUDP* udp = new WiFiUDP();
+  
+  WiFiUDPWrapper* udpWrapper = new WiFiUDPWrapper(udp);
+  
+  return NetworkFactory::createNetworkUDP(udpWrapper);
+}
+
 void WiFiNetworkHub::printStatus(Print* printer) {
   // print the SSID of the network you're attached to:
   printer->print("SSID: ");
   printer->println(WiFi.SSID());
-
-  // print your board's IP address:
-  IPAddress ip = WiFi.localIP();
-  printer->print("IP Address: ");
-  printer->println(ip);
-
+  
   // print the received signal strength:
   long rssi = WiFi.RSSI();
-  printer->print("signal strength (RSSI):");
+  printer->print("Signal Strength (RSSI): ");
   printer->print(rssi);
   printer->println(" dBm");
+
+  uint8_t macAddress[6];
+  WiFi.macAddress(macAddress);
+  printer->print("MAC Address: ");
+  for (size_t x = 0; x < sizeof(macAddress); x++) {
+    printer->print(macAddress[x], HEX);
+    if (x < sizeof(macAddress) - 1) {
+      printer->print(":");
+    } else {
+      printer->println();
+    }
+  }
+
+  printer->print("IP Address: ");
+  printer->println(WiFi.localIP());
+  
+  printer->print("Subnet Mask: ");
+  printer->println(WiFi.subnetMask());
+  
+  printer->print("Gateway IP: ");
+  printer->println(WiFi.gatewayIP());
 }
 
 // Static members and methods

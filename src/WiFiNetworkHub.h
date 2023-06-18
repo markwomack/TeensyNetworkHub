@@ -33,9 +33,10 @@ class WiFiNetworkHub : public NetworkHub {
     void stop(void);
     
     // Implementations of NetworkHub interface
-    void setHostIPAddress(IPAddress hostIPAddress);
+    IPAddress getLocalIPAddress();
+    NetworkClient getClient();
     NetworkServer* getServer(uint32_t portNum);
-    NetworkUDP* getUDP(uint32_t portNum);
+    NetworkUDP* getUDP();
     void printStatus(Print* printer);
     
     // Returns the singleton instance of WiFiNetworkHub

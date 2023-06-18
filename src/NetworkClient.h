@@ -27,10 +27,8 @@ class NetworkClient : public Client {
     void stop() { _clientWrapper->stop(); };
     uint8_t connected() { return _clientWrapper->connected(); };
     operator bool() { return *_clientWrapper ? true : false; };
-    
-    NetworkClient() {
-      _clientWrapper = new NullNetworkClientWrapper();
-    };
+    IPAddress remoteIP() { return _clientWrapper->remoteIP(); };
+    uint16_t remotePort() { return _clientWrapper->remotePort(); };
     
     ~NetworkClient() {
       delete _clientWrapper;
