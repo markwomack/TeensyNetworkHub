@@ -39,7 +39,7 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
-  Serial.println("Ethernet WebServer Example");
+  Serial.println("Network WebServer Example");
 
   // Connect the network hub
   connectNetworkHub();
