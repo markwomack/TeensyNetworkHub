@@ -152,6 +152,7 @@ bool WiFiNetworkHub::begin(const char* ssid, const char* password, Print* printe
     return false;
   }
 
+  // If a static ip address is set, use it.
   if (hasConfiguredLocalIPAddress()) {
     WiFi.config(getConfiguredLocalIPAddress(), getConfiguredDNSIPAddress(),
       getConfiguredGatewayIPAddress(), getConfiguredSubnetMask());

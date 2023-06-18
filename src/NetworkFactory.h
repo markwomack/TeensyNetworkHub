@@ -15,6 +15,8 @@
 
 // This class implements factory methods to create
 // the primary objects returned by the NetworkHub.
+// It should never need to be used directly by
+// users of the library.
 //
 class NetworkFactory {
   public:

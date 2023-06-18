@@ -11,7 +11,8 @@
 
 // The client used to interact with data sent to
 // a server. Instances of NetworkClient will be
-// returned from calls to NeworkServer.available().
+// returned from calls to NetworkHub.getClient and
+// NeworkServer.available().
 //
 class NetworkClient : public Client {
   public:

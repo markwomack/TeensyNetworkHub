@@ -22,24 +22,10 @@
  
  */
 
-// Comment out to use the wifi network hub
-#define ETHERNET_NETWORK_HUB
-
-#ifdef ETHERNET_NETWORK_HUB
-
-#include <EthernetNetworkHub.h>
-EthernetNetworkHub networkHub = EthernetNetworkHub::getInstance();
-
-#else
-
-#include <WiFiNetworkHub.h>
-WiFiNetworkHub networkHub = WiFiNetworkHub::getInstance();
-
-#endif
-
+// See this file for implementation spcific settings
 #include "connect_network_hub.h"
 
-//### ALL OF THE CODE BELOW HERE IS COMMON
+//***** ALL OF THE CODE BELOW HERE IS COMMON AND NETWORK AGNOSTIC
 
 // Initialize the Ethernet server library
 // with the IP address and port you want to use

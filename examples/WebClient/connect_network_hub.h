@@ -3,17 +3,34 @@
 // See accompanying LICENSE file for details.
 //
 
+// This include file contains all fo the network specific
+// code for setting up the network hub. You probably would
+// not use it this way in your own code, choosing one
+// implementationt to use. But organizing it into a single
+// file or class is a good idea so you can easily swap the
+// implementation as needed.
+
 #ifndef CONNECT_NETWORK_HUB_H
 #define CONNECT_NETWORK_HUB_H
 
+//***** COMMENT OUT TO USE WIFI NETWORK HUB
+#define ETHERNET_NETWORK_HUB
+
 #ifdef ETHERNET_NETWORK_HUB
+
+#include <EthernetNetworkHub.h>
+EthernetNetworkHub networkHub = EthernetNetworkHub::getInstance();
 
 // This is required for the EthernetNetowrkHub
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
 #else
+
+#include <WiFiNetworkHub.h>
+WiFiNetworkHub networkHub = WiFiNetworkHub::getInstance();
 
 // This is required for the WiFiNetwork Hub
 
@@ -31,9 +48,10 @@ const uint8_t LED_STATUS_PIN(14); // LED that is used to indicate status/idle
 
 const char SSID[]("<SSID OF YOUR WIFI HERE>");
 const char PASSWORD[]("<PASSWORD OF YOUR WIFI HERE>");
+
 #endif
 
-// Set the static IP address instead of using DHCP
+// The fixed IP address instead of using DHCP
 const IPAddress localIP(192, 168, 86, 101);
 
 void connectNetworkHub() {

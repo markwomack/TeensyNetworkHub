@@ -18,30 +18,16 @@
 
  */
 
-// Comment out to use the wifi network hub
-#define ETHERNET_NETWORK_HUB
-
-#ifdef ETHERNET_NETWORK_HUB
-
-#include <EthernetNetworkHub.h>
-EthernetNetworkHub networkHub = EthernetNetworkHub::getInstance();
-
-#else
-
-#include <WiFiNetworkHub.h>
-WiFiNetworkHub networkHub = WiFiNetworkHub::getInstance();
-
-#endif
-
+// See this file for implementation spcific settings
 #include "connect_network_hub.h"
 
-//### ALL OF THE CODE BELOW HERE IS COMMON
+//***** ALL OF THE CODE BELOW HERE IS COMMON AND NETWORK AGNOSTIC
 
 // How long to wait until deciding all data has been sent
 #define IDLE_THRESHOLD_MICROS 1000000  // 1 second
 
-// if you don't want to use DNS (and reduce your sketch size)
-// use the numeric IP instead of the name for the server:
+// if you don't want to use DNS use the numeric IP instead
+// of the name for the server:
 //IPAddress server(142,251,40,132);  // numeric IP for Google (no DNS)
 char server[] = "www.google.com";    // name address for Google (using DNS)
 

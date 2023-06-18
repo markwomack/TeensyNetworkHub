@@ -42,6 +42,8 @@ class NetworkHub {
       _hasSubnetMask = true;
     };
     
+    // These methods must be implemented by subclasses
+    
     virtual IPAddress getLocalIPAddress() = 0;
     
     // Create a client to access the network.
@@ -71,6 +73,8 @@ class NetworkHub {
     IPAddress _gatewayIPAddress;
     bool _hasSubnetMask = false;
     IPAddress _subnetMask;
+    
+    // Common methods for all subclasses
     
     bool hasConfiguredLocalIPAddress() {
       return _hasLocalIPAddress;
