@@ -25,6 +25,7 @@
 class WiFiClientWrapper : public NetworkClientWrapper {
   public:
     
+    ~WiFiClientWrapper() { };
     int connect(IPAddress ip, uint16_t port) { return _wifiClient.connect(ip, port); };
     int connect(const char *host, uint16_t port) { return _wifiClient.connect(host, port); };
     int connectSSL(IPAddress ip, uint16_t port) { return _wifiClient.connectSSL(ip, port); };
@@ -41,6 +42,10 @@ class WiFiClientWrapper : public NetworkClientWrapper {
     operator bool() { return _wifiClient ? true : false; };
     IPAddress remoteIP() { return _wifiClient.remoteIP(); };
     uint16_t remotePort() { return _wifiClient.remotePort(); };
+    
+    NetworkClientWrapper* clone() {
+      return new WiFiClientWrapper(_wifiClient);
+    }
     
   private:
     friend class WiFiNetworkHub;

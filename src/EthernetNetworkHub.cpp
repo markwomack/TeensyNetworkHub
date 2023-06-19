@@ -35,6 +35,10 @@ class EthernetClientWrapper : public NetworkClientWrapper {
     IPAddress remoteIP() { return _ethernetClient.remoteIP(); };
     uint16_t remotePort() { return _ethernetClient.remotePort(); };
     
+    NetworkClientWrapper* clone() {
+      return new EthernetClientWrapper(_ethernetClient);
+    }
+    
   private:
     friend class EthernetNetworkHub;
     friend class EthernetServerWrapper;

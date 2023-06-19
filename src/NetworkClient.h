@@ -31,6 +31,24 @@ class NetworkClient : public Client {
     IPAddress remoteIP() { return _clientWrapper->remoteIP(); };
     uint16_t remotePort() { return _clientWrapper->remotePort(); };
     
+    // copy assignment
+    NetworkClient& operator=(const NetworkClient& other) {
+      // Guard self assignment
+      if (this == &other)
+          return *this;
+      
+      _clientWrapper = other._clientWrapper->clone();
+      
+      return *this;
+    }
+    
+    // This constructor can be used to declare variables, but
+    // NetworkHub.createClient() or NetworkServer.available() should be
+    // used to assign a usable version.
+    NetworkClient() {
+      _clientWrapper = new NullNetworkClientWrapper();
+    }
+    
     ~NetworkClient() {
       delete _clientWrapper;
     };
