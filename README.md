@@ -52,7 +52,12 @@ to create a new instance.
 
 ## Examples
 The included [examples](https://github.com/markwomack/TeensyNetworkHub/tree/main/examples) come from the original
-NativeEthernet examples. They demonstrate basic usage for NetworkClient, NetworkServer, and NetworkUDP.
+NativeEthernet examples. They demonstrate basic usage for NetworkClient, NetworkServer, and NetworkUDP. The
+[connect_network_hub.h](https://github.com/markwomack/TeensyNetworkHub/blob/main/examples/UDPSendReceiveString/connect_network_hub.h)
+file demonstrates how to connect to each implementation. You probably won't want to use this file in your own
+code, instead choosing the implemenation you want to use in your project. But if you organize your code to
+maintain the setup and connection specific code to one file or class, then if you need to switch implemenations,
+then it is just a simple file change/swap. The rest of your code will remain the same.
 
 ## Extending
 If you have a favorite network library for connecting to the internet, it is easy to extend TeensyNetworkHub to
