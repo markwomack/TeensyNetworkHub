@@ -4,10 +4,10 @@
 //
 
 // Third-party includes
-#include <NativeEthernet.h>
+#include <NativeEthernet.h>  // https://github.com/vjmuzik/NativeEthernet
 
 // Local includes
-#include "EthernetNetworkHub.h"
+#include "NativeEthernetNetworkHub.h"
 #include "NetworkFactory.h"
 #include "NetworkClient.h"
 #include "NetworkClientWrapper.h"
@@ -18,7 +18,7 @@
 
 // NetworkClientWrapper implementation for NativeEthernet EthernetClient.
 //
-class EthernetClientWrapper : public NetworkClientWrapper {
+class NativeEthernetClientWrapper : public NetworkClientWrapper {
   public:
     int connect(IPAddress ip, uint16_t port) { return _ethernetClient.connect(ip, port); };
     int connect(const char *host, uint16_t port) { return _ethernetClient.connect(host, port); };
@@ -36,15 +36,15 @@ class EthernetClientWrapper : public NetworkClientWrapper {
     uint16_t remotePort() { return _ethernetClient.remotePort(); };
     
     NetworkClientWrapper* clone() {
-      return new EthernetClientWrapper(_ethernetClient);
+      return new NativeEthernetClientWrapper(_ethernetClient);
     }
     
   private:
-    friend class EthernetNetworkHub;
-    friend class EthernetServerWrapper;
+    friend class NativeEthernetNetworkHub;
+    friend class NativeEthernetServerWrapper;
     
-    EthernetClientWrapper() {};
-    EthernetClientWrapper(EthernetClient& ethernetClient) {
+    NativeEthernetClientWrapper() {};
+    NativeEthernetClientWrapper(EthernetClient& ethernetClient) {
       _ethernetClient = ethernetClient;
     };
     
@@ -53,12 +53,12 @@ class EthernetClientWrapper : public NetworkClientWrapper {
 
 // NetworkServerWrapper implementation for NativeEthernet EthernetServer.
 //
-class EthernetServerWrapper : public NetworkServerWrapper {
+class NativeEthernetServerWrapper : public NetworkServerWrapper {
   public:
     NetworkClient available() {
       EthernetClient ethernetClient = _ethernetServer.available();
       
-      EthernetClientWrapper* clientWrapper = new EthernetClientWrapper(ethernetClient);
+      NativeEthernetClientWrapper* clientWrapper = new NativeEthernetClientWrapper(ethernetClient);
       
       return NetworkFactory::createNetworkClient(clientWrapper);
     };
@@ -68,9 +68,9 @@ class EthernetServerWrapper : public NetworkServerWrapper {
     size_t write(const uint8_t *buf, size_t size) { return _ethernetServer.write(buf, size); };
     
   private:
-    friend class EthernetNetworkHub;
+    friend class NativeEthernetNetworkHub;
     
-    EthernetServerWrapper(EthernetServer& ethernetServer) {
+    NativeEthernetServerWrapper(EthernetServer& ethernetServer) {
       _ethernetServer = ethernetServer;
     };
     
@@ -79,7 +79,7 @@ class EthernetServerWrapper : public NetworkServerWrapper {
 
 // NetworkUDPWrapper implementation for NativeEthernet EthernetUDP.
 //
-class EthernetUDPWrapper : public NetworkUDPWrapper {
+class NativeEthernetUDPWrapper : public NetworkUDPWrapper {
   public:
     
     uint8_t begin(uint16_t port) { return _ethernetUDP.begin(port); };
@@ -101,16 +101,16 @@ class EthernetUDPWrapper : public NetworkUDPWrapper {
     uint16_t remotePort() { return _ethernetUDP.remotePort(); };
     
   private:
-    friend class EthernetNetworkHub;
+    friend class NativeEthernetNetworkHub;
     
-    EthernetUDPWrapper(EthernetUDP& ethernetUDP) {
+    NativeEthernetUDPWrapper(EthernetUDP& ethernetUDP) {
       _ethernetUDP = ethernetUDP;
     };
     
     EthernetUDP _ethernetUDP;
 };
 
-bool EthernetNetworkHub::begin(uint8_t *macAddress, Print* printer) {
+bool NativeEthernetNetworkHub::begin(uint8_t *macAddress, Print* printer) {
 
   bool hadError = false;
   
@@ -143,34 +143,34 @@ bool EthernetNetworkHub::begin(uint8_t *macAddress, Print* printer) {
   return !hadError;
 }
 
-IPAddress EthernetNetworkHub::getLocalIPAddress() {
+IPAddress NativeEthernetNetworkHub::getLocalIPAddress() {
   return Ethernet.localIP();
 }
 
-NetworkClient EthernetNetworkHub::getClient() {
-  EthernetClientWrapper* clientWrapper = new EthernetClientWrapper();
+NetworkClient NativeEthernetNetworkHub::getClient() {
+  NativeEthernetClientWrapper* clientWrapper = new NativeEthernetClientWrapper();
   
   return NetworkFactory::createNetworkClient(clientWrapper);
 }
 
-NetworkServer* EthernetNetworkHub::getServer(uint32_t portNum) {
+NetworkServer* NativeEthernetNetworkHub::getServer(uint32_t portNum) {
   EthernetServer tcpServer(portNum);
   
-  EthernetServerWrapper* serverWrapper = new EthernetServerWrapper(tcpServer);
+  NativeEthernetServerWrapper* serverWrapper = new NativeEthernetServerWrapper(tcpServer);
   
   return NetworkFactory::createNetworkServer(serverWrapper);
 }
     
-NetworkUDP* EthernetNetworkHub::getUDP() {
+NetworkUDP* NativeEthernetNetworkHub::getUDP() {
   EthernetUDP udp;
   
-  EthernetUDPWrapper* udpWrapper = new EthernetUDPWrapper(udp);
+  NativeEthernetUDPWrapper* udpWrapper = new NativeEthernetUDPWrapper(udp);
   
   return NetworkFactory::createNetworkUDP(udpWrapper);
 }
 
 
-void EthernetNetworkHub::printStatus(Print* printer) {
+void NativeEthernetNetworkHub::printStatus(Print* printer) {
   printer->print("Hardware Status: ");
   switch(Ethernet.hardwareStatus()) {
     case EthernetNoHardware:
@@ -234,13 +234,13 @@ void EthernetNetworkHub::printStatus(Print* printer) {
 
 // Static members and methods
 
-EthernetNetworkHub* EthernetNetworkHub::_ethernetNetworkHub = NULL;
+NativeEthernetNetworkHub* NativeEthernetNetworkHub::_nativeEthernetNetworkHub = NULL;
 
-// Returns the instance of EthernetNetworkHub
-EthernetNetworkHub EthernetNetworkHub::getInstance() {
-  if (_ethernetNetworkHub == NULL) {
-    _ethernetNetworkHub = new EthernetNetworkHub();
+// Returns the instance of NativeEthernetNetworkHub
+NativeEthernetNetworkHub NativeEthernetNetworkHub::getInstance() {
+  if (_nativeEthernetNetworkHub == NULL) {
+    _nativeEthernetNetworkHub = new NativeEthernetNetworkHub();
   }
-  return *_ethernetNetworkHub;
+  return *_nativeEthernetNetworkHub;
 };
     

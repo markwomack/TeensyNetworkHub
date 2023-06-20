@@ -3,21 +3,21 @@
 // See accompanying LICENSE file for details.
 //
  
-#ifndef ETHERNETNETWORKHUB_H
-#define ETHERNETNETWORKHUB_H
+#ifndef QNETHERNETNETWORKHUB_H
+#define QNETHERNETNETWORKHUB_H
 
 #include <Arduino.h>
 
 #include "NetworkHub.h"
 
 // A network hub based on an ethernet connection
-// implemented by NativeEthernet library.
-//   https://github.com/vjmuzik/NativeEthernet
+// implemented by QNEthernet library.
+//   https://github.com/ssilverman/QNEthernet
 //
-class EthernetNetworkHub : public NetworkHub {
+class QNEthernetNetworkHub : public NetworkHub {
   public:
     
-    bool begin(uint8_t *macAddress, Print* printer);
+    bool begin(Print* printer);
     
     // NetworkHub methods
     IPAddress getLocalIPAddress();
@@ -27,12 +27,12 @@ class EthernetNetworkHub : public NetworkHub {
     void printStatus(Print* printer);
     
     // Returns the singleton instance of EthernetNetworkHub
-    static EthernetNetworkHub getInstance();
+    static QNEthernetNetworkHub getInstance();
     
   protected:
-    EthernetNetworkHub() { /* Nothing to see here, move along. */ };
+    QNEthernetNetworkHub() { /* Nothing to see here, move along. */ };
     
-    static EthernetNetworkHub* _ethernetNetworkHub;
+    static QNEthernetNetworkHub* _qnEthernetNetworkHub;
 };
 
-#endif // ETHERNETNETWORKHUB_H
+#endif // QNETHERNETNETWORKHUB_H

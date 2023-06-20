@@ -11,7 +11,7 @@
 #include <WiFiUdp.h>
 
 // Local includes
-#include "WiFiNetworkHub.h"
+#include "WiFiNINANetworkHub.h"
 #include "NetworkFactory.h"
 #include "NetworkClient.h"
 #include "NetworkClientWrapper.h"
@@ -22,10 +22,10 @@
 
 // NetworkClientWrapper implementation for WiFiNINA WiFiClient.
 //
-class WiFiClientWrapper : public NetworkClientWrapper {
+class WiFiNINAClientWrapper : public NetworkClientWrapper {
   public:
     
-    ~WiFiClientWrapper() { };
+    ~WiFiNINAClientWrapper() { };
     int connect(IPAddress ip, uint16_t port) { return _wifiClient.connect(ip, port); };
     int connect(const char *host, uint16_t port) { return _wifiClient.connect(host, port); };
     int connectSSL(IPAddress ip, uint16_t port) { return _wifiClient.connectSSL(ip, port); };
@@ -44,14 +44,14 @@ class WiFiClientWrapper : public NetworkClientWrapper {
     uint16_t remotePort() { return _wifiClient.remotePort(); };
     
     NetworkClientWrapper* clone() {
-      return new WiFiClientWrapper(_wifiClient);
+      return new WiFiNINAClientWrapper(_wifiClient);
     }
     
   private:
-    friend class WiFiNetworkHub;
-    friend class WiFiServerWrapper;
+    friend class WiFiNINANetworkHub;
+    friend class WiFiNINAServerWrapper;
     
-    WiFiClientWrapper(WiFiClient& wifiClient) {
+    WiFiNINAClientWrapper(WiFiClient& wifiClient) {
       _wifiClient = wifiClient;
     };
     
@@ -60,12 +60,12 @@ class WiFiClientWrapper : public NetworkClientWrapper {
 
 // NetworkServerWrapper implementation for WiFiNINA WiFiServer.
 //
-class WiFiServerWrapper : public NetworkServerWrapper {
+class WiFiNINAServerWrapper : public NetworkServerWrapper {
   public:
     NetworkClient available() {
       WiFiClient wifiClient = _wifiServer->available();
       
-      WiFiClientWrapper* clientWrapper = new WiFiClientWrapper(wifiClient);
+      WiFiNINAClientWrapper* clientWrapper = new WiFiNINAClientWrapper(wifiClient);
       
       return NetworkFactory::createNetworkClient(clientWrapper);
     };
@@ -74,14 +74,14 @@ class WiFiServerWrapper : public NetworkServerWrapper {
     size_t write(uint8_t b) { return _wifiServer->write(b); };
     size_t write(const uint8_t *buf, size_t size) { return _wifiServer->write(buf, size); };
     
-    ~WiFiServerWrapper() {
+    ~WiFiNINAServerWrapper() {
       delete _wifiServer;
     };
     
   private:
-    friend class WiFiNetworkHub;
+    friend class WiFiNINANetworkHub;
     
-    WiFiServerWrapper(WiFiServer* wifiServer) {
+    WiFiNINAServerWrapper(WiFiServer* wifiServer) {
       _wifiServer = wifiServer;
     };
     
@@ -90,7 +90,7 @@ class WiFiServerWrapper : public NetworkServerWrapper {
 
 // NetworkUDPWrapper implementation for WiFiNINA WiFiUDP.
 //
-class WiFiUDPWrapper : public NetworkUDPWrapper {
+class WiFiNINAUDPWrapper : public NetworkUDPWrapper {
   public:
     
     uint8_t begin(uint16_t port) { return _wifiUDP->begin(port); };
@@ -111,14 +111,14 @@ class WiFiUDPWrapper : public NetworkUDPWrapper {
     IPAddress remoteIP() { return _wifiUDP->remoteIP(); };
     uint16_t remotePort() { return _wifiUDP->remotePort(); };
     
-    ~WiFiUDPWrapper() {
+    ~WiFiNINAUDPWrapper() {
       delete _wifiUDP;
     };
     
   private:
-    friend class WiFiNetworkHub;
+    friend class WiFiNINANetworkHub;
     
-    WiFiUDPWrapper(WiFiUDP* wifiUDP) {
+    WiFiNINAUDPWrapper(WiFiUDP* wifiUDP) {
       _wifiUDP = wifiUDP;
     };
     
@@ -128,7 +128,7 @@ class WiFiUDPWrapper : public NetworkUDPWrapper {
 // Set up all of the SPI, busy, and reset
 // pins used by the Adafruit Airlift/ESP32.
 //
-void WiFiNetworkHub::setPins(uint8_t spiMOSIPin, uint8_t spiMISOPin, uint8_t spiSCKPin,
+void WiFiNINANetworkHub::setPins(uint8_t spiMOSIPin, uint8_t spiMISOPin, uint8_t spiSCKPin,
     uint8_t spiCSPin, uint8_t resetPin, uint8_t busyPin) {
 
   // Make sure the right pins are set for SPI
@@ -146,7 +146,7 @@ void WiFiNetworkHub::setPins(uint8_t spiMOSIPin, uint8_t spiMISOPin, uint8_t spi
 
 // Starts the network hub specifically using WiFiNINA interface.
 //
-bool WiFiNetworkHub::begin(const char* ssid, const char* password, Print* printer) {
+bool WiFiNINANetworkHub::begin(const char* ssid, const char* password, Print* printer) {
 
   printer->print("Found firmware ");
   printer->println(WiFi.firmwareVersion());
@@ -188,39 +188,39 @@ bool WiFiNetworkHub::begin(const char* ssid, const char* password, Print* printe
   return true;
 }
 
-void WiFiNetworkHub::stop(void) {
+void WiFiNINANetworkHub::stop(void) {
   WiFi.end();
 }
 
-IPAddress WiFiNetworkHub::getLocalIPAddress() {
+IPAddress WiFiNINANetworkHub::getLocalIPAddress() {
   return WiFi.localIP();
 }
 
-NetworkClient WiFiNetworkHub::getClient() {
+NetworkClient WiFiNINANetworkHub::getClient() {
   WiFiClient client;
   
-  WiFiClientWrapper* clientWrapper = new WiFiClientWrapper(client);
+  WiFiNINAClientWrapper* clientWrapper = new WiFiNINAClientWrapper(client);
   
   return NetworkFactory::createNetworkClient(clientWrapper);
 }
 
-NetworkServer* WiFiNetworkHub::getServer(uint32_t portNum) {
+NetworkServer* WiFiNINANetworkHub::getServer(uint32_t portNum) {
   WiFiServer* tcpServer = new WiFiServer(portNum);
   
-  WiFiServerWrapper* serverWrapper = new WiFiServerWrapper(tcpServer);
+  WiFiNINAServerWrapper* serverWrapper = new WiFiNINAServerWrapper(tcpServer);
   
   return NetworkFactory::createNetworkServer(serverWrapper);
 }
 
-NetworkUDP* WiFiNetworkHub::getUDP() {
+NetworkUDP* WiFiNINANetworkHub::getUDP() {
   WiFiUDP* udp = new WiFiUDP();
   
-  WiFiUDPWrapper* udpWrapper = new WiFiUDPWrapper(udp);
+  WiFiNINAUDPWrapper* udpWrapper = new WiFiNINAUDPWrapper(udp);
   
   return NetworkFactory::createNetworkUDP(udpWrapper);
 }
 
-void WiFiNetworkHub::printStatus(Print* printer) {
+void WiFiNINANetworkHub::printStatus(Print* printer) {
   // print the SSID of the network you're attached to:
   printer->print("SSID: ");
   printer->println(WiFi.SSID());
@@ -255,12 +255,12 @@ void WiFiNetworkHub::printStatus(Print* printer) {
 
 // Static members and methods
 
-WiFiNetworkHub* WiFiNetworkHub::_wifiNetworkHub = NULL;
+WiFiNINANetworkHub* WiFiNINANetworkHub::_wifiNetworkHub = NULL;
     
-// Returns the instance of WiFiNetworkHub
-WiFiNetworkHub WiFiNetworkHub::getInstance() {
+// Returns the instance of WiFiNINANetworkHub
+WiFiNINANetworkHub WiFiNINANetworkHub::getInstance() {
   if (_wifiNetworkHub == NULL) {
-    _wifiNetworkHub = new WiFiNetworkHub();
+    _wifiNetworkHub = new WiFiNINANetworkHub();
   }
   return *_wifiNetworkHub;
 };

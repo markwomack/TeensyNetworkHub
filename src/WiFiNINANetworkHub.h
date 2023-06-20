@@ -3,8 +3,8 @@
 // See accompanying LICENSE file for details.
 //
  
-#ifndef WIFINETWORKHUB_H
-#define WIFINETWORKHUB_H
+#ifndef WIFININANETWORKHUB_H
+#define WIFININANETWORKHUB_H
 
 #include "NetworkHub.h"
 
@@ -19,7 +19,7 @@
 // extra methods to set the pins, wifi network,
 // and wifi password.
 //
-class WiFiNetworkHub : public NetworkHub {
+class WiFiNINANetworkHub : public NetworkHub {
   public:
     // The pins used by the AirLift/ESP32 board.
     void setPins(uint8_t spiMOSIPin, uint8_t spiMISOPin, uint8_t spiSCKPin,
@@ -39,13 +39,13 @@ class WiFiNetworkHub : public NetworkHub {
     NetworkUDP* getUDP();
     void printStatus(Print* printer);
     
-    // Returns the singleton instance of WiFiNetworkHub
-    static WiFiNetworkHub getInstance();
+    // Returns the singleton instance of WiFiNINANetworkHub
+    static WiFiNINANetworkHub getInstance();
     
   protected:
-    WiFiNetworkHub() { /* Nothing to see here, move along. */ };
+    WiFiNINANetworkHub() { /* Nothing to see here, move along. */ };
     
-    static WiFiNetworkHub* _wifiNetworkHub;
+    static WiFiNINANetworkHub* _wifiNetworkHub;
 };
 
-#endif // WIFINETWORKHUB_H
+#endif // WIFININANETWORKHUB_H

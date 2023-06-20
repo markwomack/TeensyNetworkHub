@@ -65,7 +65,7 @@ void setup() {
 void loop() {
   // if there's data available, read a packet
   int packetSize = udp->parsePacket();
-  if (packetSize) {
+  if (packetSize > 0) {
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     Serial.print("From ");
@@ -80,7 +80,8 @@ void loop() {
     Serial.println(udp->remotePort());
 
     // read the packet into packetBufffer
-    udp->read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
+    size_t size = udp->read(packetBuffer, UDP_TX_PACKET_MAX_SIZE-1);
+    packetBuffer[size] = 0;
     Serial.println("Contents:");
     Serial.println(packetBuffer);
 
