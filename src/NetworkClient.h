@@ -34,8 +34,9 @@ class NetworkClient : public Client {
     // copy assignment
     NetworkClient& operator=(const NetworkClient& other) {
       // Guard self assignment
-      if (this == &other)
+      if (this == &other) {
           return *this;
+      }
       
       _clientWrapper = other._clientWrapper->clone();
       
