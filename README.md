@@ -63,7 +63,7 @@ then it is just a simple file change/swap. The rest of your code will remain the
 If you have a favorite network library for connecting to the internet, it is easy to extend TeensyNetworkHub to
 support it. You will need to implement wrappers to integrate the library with TeensyNetworkHub, and implement
 a version of NetworkHub to iniitalize the connection and provide the clients, servers, and UDPs. Please see
-[WiFiNetworkHub](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/WiFiNetworkHub.h),
+[WiFiNINANetworkHub](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/WiFiNINANetworkHub.h),
 [QNEthernetNetworkHub](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/QNEthernetNetworkHub.h), or
 [EthernetNetworkHub](https://github.com/markwomack/TeensyNetworkHub/blob/main/src/EthernetNetworkHub.h) for examples.
 
