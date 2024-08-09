@@ -122,7 +122,7 @@ class NetworkHub {
       if (!_hasSubnetMask) {
         _subnetMask = IPAddress(255, 255, 255, 0);
       }
-      return _gatewayIPAddress;
+      return _subnetMask;
     };
 };
 
